@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Prediksi Kelayakan Kredit | Credit Risk Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans antialiased">
+
+    <!-- Header Navigation -->
+    <nav class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <div class="bg-blue-600 p-2 rounded-lg text-white">
+                <i class="fa-solid fa-shield-halved text-xl"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg leading-tight">RiskGuard AI</h1>
+                <p class="text-xs text-slate-400">Credit Default Risk Assessment System</p>
+            </div>
+        </div>
+        <span class="bg-blue-500/10 text-blue-400 text-xs px-3 py-1 rounded-full border border-blue-500/20 font-mono">Model: Logistic Regression (Balanced)</span>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Input Form Section (8 Cols) -->
+        <div class="lg:col-span-8 bg-slate-950/50 border border-slate-800 rounded-2xl p-6 shadow-xl">
+            <h2 class="text-xl font-bold mb-6 text-white flex items-center gap-2">
+                <i class="fa-solid fa-sliders text-blue-500"></i> Form Assessment Nasabah
+            </h2>
+
+            <form id="riskForm" class="space-y-6">
+                <!-- Group 1: Demografi & Limit -->
+                <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/80">
+                    <h3 class="text-sm font-semibold text-blue-400 uppercase tracking-wider mb-4">Profil & Limit Kredit</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Limit Kredit (NTD)</label>
+                            <input type="number" name="LIMIT_BAL" value="50000" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Usia (Tahun)</label>
+                            <input type="number" name="AGE" value="30" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Jenis Kelamin</label>
+                            <select name="SEX" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <option value="1">Laki-Laki</option>
+                                <option value="2">Perempuan</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Pendidikan</label>
+                            <select name="EDUCATION" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <option value="1">Pascasarjana (Graduate)</option>
+                                <option value="2" selected>Sarjana (University)</option>
+                                <option value="3">SMA (High School)</option>
+                                <option value="4">Lainnya</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Status Pernikahan</label>
+                            <select name="MARRIAGE" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <option value="1">Menikah</option>
+                                <option value="2" selected>Lajang</option>
+                                <option value="3">Lainnya</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Group 2: Status Pembayaran Terakhir (PAY_0) -->
+                <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/80">
+                    <h3 class="text-sm font-semibold text-blue-400 uppercase tracking-wider mb-4">Riwayat Tunggakan Terakhir</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Status Pembayaran Bulan Lalu (PAY_0)</label>
+                            <select name="PAY_0" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <option value="-1">Tepat Waktu / Lunas (-1)</option>
+                                <option value="0" selected>Penggunaan Pembayaran Bergulir (0)</option>
+                                <option value="1">Tunggakan 1 Bulan</option>
+                                <option value="2">Tunggakan 2 Bulan</option>
+                                <option value="3">Tunggakan 3 Bulan+</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Status Pembayaran 2 Bulan Lalu (PAY_2)</label>
+                            <select name="PAY_2" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <option value="-1">Tepat Waktu / Lunas (-1)</option>
+                                <option value="0" selected>Penggunaan Pembayaran Bergulir (0)</option>
+                                <option value="1">Tunggakan 1 Bulan</option>
+                                <option value="2">Tunggakan 2 Bulan</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Input tersembunyi default untuk periode 3-6 agar form simpel -->
+                    <input type="hidden" name="PAY_3" value="0">
+                    <input type="hidden" name="PAY_4" value="0">
+                    <input type="hidden" name="PAY_5" value="0">
+                    <input type="hidden" name="PAY_6" value="0">
+                </div>
+
+                <!-- Group 3: Tagihan & Pembayaran Terakhir -->
+                <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/80">
+                    <h3 class="text-sm font-semibold text-blue-400 uppercase tracking-wider mb-4">Finansial Terakhir (Bulan Terakhir)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Jumlah Tagihan Terakhir (BILL_AMT1)</label>
+                            <input type="number" name="BILL_AMT1" value="15000" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Jumlah Pembayaran Terakhir (PAY_AMT1)</label>
+                            <input type="number" name="PAY_AMT1" value="2000" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
+                        </div>
+                    </div>
+
+                    <!-- Hidden default value for history AMT 2-6 -->
+                    <input type="hidden" name="BILL_AMT2" value="14000">
+                    <input type="hidden" name="BILL_AMT3" value="13000">
+                    <input type="hidden" name="BILL_AMT4" value="12000">
+                    <input type="hidden" name="BILL_AMT5" value="11000">
+                    <input type="hidden" name="BILL_AMT6" value="10000">
+                    
+                    <input type="hidden" name="PAY_AMT2" value="1500">
+                    <input type="hidden" name="PAY_AMT3" value="1500">
+                    <input type="hidden" name="PAY_AMT4" value="1500">
+                    <input type="hidden" name="PAY_AMT5" value="1500">
+                    <input type="hidden" name="PAY_AMT6" value="1500">
+                </div>
+
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 px-6 rounded-xl transition duration-200 shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-calculator"></i> Analisis Risiko Kredit
+                </button>
+            </form>
+        </div>
+
+        <!-- Result Card Section (4 Cols) -->
+        <div class="lg:col-span-4 space-y-6">
+            <div id="placeholderResult" class="bg-slate-950/50 border border-slate-800 rounded-2xl p-6 text-center text-slate-500 flex flex-col items-center justify-center min-h-[350px]">
+                <i class="fa-solid fa-chart-pie text-4xl mb-3 text-slate-700"></i>
+                <p class="text-sm">Silakan isi formulir dan klik <strong>Analisis Risiko Kredit</strong> untuk melihat hasil prediksi.</p>
+            </div>
+
+            <!-- Result Dashboard Card (Hidden by Default) -->
+            <div id="resultCard" class="hidden bg-slate-950/50 border border-slate-800 rounded-2xl p-6 shadow-xl transition-all duration-300">
+                <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Hasil Evaluasi Risiko</h3>
+                
+                <div id="statusBadge" class="p-4 rounded-xl mb-6 text-center border">
+                    <i id="statusIcon" class="text-3xl mb-2 block"></i>
+                    <h4 id="statusTitle" class="text-xl font-bold"></h4>
+                    <p id="statusSub" class="text-xs opacity-80 mt-1"></p>
+                </div>
+
+                <!-- Probability Bar -->
+                <div class="space-y-2 mb-6">
+                    <div class="flex justify-between text-xs">
+                        <span class="text-slate-400">Probabilitas Default</span>
+                        <span id="probText" class="font-bold text-white">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-800 rounded-full h-3 overflow-hidden">
+                        <div id="probBar" class="h-full transition-all duration-500 rounded-full" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Action Recommendation -->
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+                    <h5 class="text-xs font-semibold text-slate-300 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-lightbulb text-amber-400"></i> Rekomendasi Keputusan
+                    </h5>
+                    <p id="recommendationText" class="text-xs text-slate-400 leading-relaxed"></p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.getElementById('riskForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            const response = await fetch('/predict', {
+                method: 'POST',
+                body: formData
+            });
+            const res = await response.json();
+
+            if (res.status === 'success') {
+                document.getElementById('placeholderResult').classList.add('hidden');
+                const resultCard = document.getElementById('resultCard');
+                resultCard.classList.remove('hidden');
+
+                const statusBadge = document.getElementById('statusBadge');
+                const statusIcon = document.getElementById('statusIcon');
+                const statusTitle = document.getElementById('statusTitle');
+                const statusSub = document.getElementById('statusSub');
+                const probBar = document.getElementById('probBar');
+                const probText = document.getElementById('probText');
+                const reco = document.getElementById('recommendationText');
+
+                probText.innerText = res.probability + '%';
+                probBar.style.width = res.probability + '%';
+
+                if (res.prediction === 1) {
+                    statusBadge.className = "p-4 rounded-xl mb-6 text-center border bg-red-500/10 border-red-500/30 text-red-400";
+                    statusIcon.className = "fa-solid fa-triangle-exclamation text-3xl mb-2 text-red-500";
+                    statusTitle.innerText = "BERISIKO GAGAL BAYAR";
+                    statusSub.innerText = "Tingkat Risiko: " + res.risk_level;
+                    probBar.className = "h-full bg-red-500 transition-all duration-500 rounded-full";
+                    reco.innerText = "TOLAK atau BERIKAN SYARAT KETAT. Nasabah memiliki indikasi kuat terjadinya default. Disarankan untuk menurunkan limit kredit atau meminta penjamin tambahan.";
+                } else {
+                    statusBadge.className = "p-4 rounded-xl mb-6 text-center border bg-emerald-500/10 border-emerald-500/30 text-emerald-400";
+                    statusIcon.className = "fa-solid fa-circle-check text-3xl mb-2 text-emerald-500";
+                    statusTitle.innerText = "LAYAK / TIDAK BERISIKO";
+                    statusSub.innerText = "Tingkat Risiko: " + res.risk_level;
+                    probBar.className = "h-full bg-emerald-500 transition-all duration-500 rounded-full";
+                    reco.innerText = "SETUJUI PERMOHONAN. Profil riwayat pembayaran dan demografi nasabah menunjukkan risiko gagal bayar yang tergolong rendah.";
+                }
+            }
+        });
+    </script>
+</body>
+</html>
